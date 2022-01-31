@@ -136,16 +136,12 @@ class S3Dataset(S3BaseClass, Dataset):
                 is assumed as a prefix.
         """
         S3BaseClass.__init__(self, urls_list)
-        # Initialize the handler in the worker since we want each worker to have
-        # it's own handler
-        self.handler = None
+        self.handler = _pywrap_s3_io.S3Init()
 
     def __len__(self):
         return len(self.urls_list)
 
     def __getitem__(self, idx):
-        if self.handler == None:
-            self.handler = _pywrap_s3_io.S3Init()
         filename = self.urls_list[idx]
         fileobj = self.handler.s3_read(filename)
         return filename, fileobj
